@@ -121,6 +121,7 @@ dmypy.json
 .idea
 
 # Custom
+*.csv
 *.db
 *.backup
 *.code-workspace
