@@ -3,47 +3,72 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Simple Flask App</title>
+    <title>Baza Leków</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
-    <input type="text" id="textInput" placeholder="Enter something...">
-    <button onclick="submitData()">Submit</button>
-    <h3>Entries:</h3>
-    <ul id="entriesList"></ul>
+    <input type=" text" id="textInput" placeholder="Enter something...">
+    <button onclick="submitQuery()">Submit</button>
+    <h3 id="label"></h3>
+    <table id="resultsTable" hidden="1">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
 
     <script>
-        async function submitData() {
+        async function submitQuery() {
             const inputField = document.getElementById('textInput')
             const text = inputField.value;
-            await fetch('/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: text })
-            });
+            loadData(text);
             inputField.value = "";
-            loadEntries();
         }
 
-        async function loadEntries() {
-            const res = await fetch('/entries');
-            const data = await res.json();
-            const list = document.getElementById('entriesList');
-            list.innerHTML = '';
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item[1];
-                list.appendChild(li);
-            });
+        async function loadData(query) {
+            const table = document.getElementById('resultsTable');
+            table.hidden = true;
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            const url = `/search?query=${encodeURIComponent(query)}`;
+
+            try {
+                const res = await fetch(url);
+                const result = await res.json();
+
+                const columns = result.columns;
+                const data = result.rows;
+
+                if (data.length === 0) {
+                    document.getElementById('label').innerHTML = "Nic nie znaleziono";
+                    return;
+                }
+
+                // Generate headers
+                thead.innerHTML = '<tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr>';
+
+                // Generate rows using the same column order
+                tbody.innerHTML = data.map(row =>
+                    '<tr>' + columns.map(col => {
+                        const cellContent = row[col] ?? '';
+                        return `<td>${cellContent}</td>`;
+                    }).join('') + '</tr>'
+                ).join('');
+
+                table.hidden = false;
+                const message = result.length < 1000 ? `Znaleziono ${result.length} wyników` : `Znaleziono >1000 wyników`;
+                document.getElementById('label').innerHTML = message;
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
         }
 
         document.getElementById("textInput").addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
-                submitData();
+                submitQuery();
             }
         });
 
-        loadEntries(); // Load entries on page load
     </script>
 </body>
 

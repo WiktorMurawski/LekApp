@@ -8,32 +8,33 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
-def submit():
-    data = request.json
-    content = data.get('content')
-    if content:
-        conn = sqlite3.connect('database.db')
-        c = conn.cursor()
-        c.execute('INSERT INTO entries (content) VALUES (?)', (content,))
-        conn.commit()
-        conn.close()
-        return jsonify({"message": "Saved"}), 200
-    return jsonify({"message": "Invalid input"}), 400
+@app.route('/search', methods=['GET'])
+def search_entries():
+    query = request.args.get('query', '').lower()
 
-@app.route('/entries', methods=['GET'])
-def get_entries():
-    conn = sqlite3.connect('lekidatabase.db')
+    conn = sqlite3.connect(SQLITE_DB)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute('SELECT * FROM entries')
-    rows = c.fetchall()
+    sql_query = f"""
+        SELECT * FROM {TABLE_NAME}
+        WHERE [Nazwa Produktu Leczniczego] LIKE ?
+        LIMIT 1000
+    """
+    c.execute(sql_query, (f'%{query}%',))
+    column_names = [desc[0] for desc in c.description]
+    rows = [dict(row) for row in c.fetchall()]
     conn.close()
-    return jsonify(rows)
+
+    return jsonify({
+        'length': len(rows),
+        'columns': column_names,
+        'rows': [dict(row) for row in rows]
+    })
 
 if __name__ == '__main__':
-    CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"  # Put your CSV URL here
-    CSV_FILE = "rejestr.csv"
-    SQLITE_DB = "lekidatabase.db"
+    CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
+    CSV_FILE = "downloads/rejestr.csv"
+    SQLITE_DB = "database/lekidatabase.db"
     TABLE_NAME = "leki"
 
     try:
@@ -41,6 +42,5 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"Something went wrong: {e}")
 
-    # init_db()
     debug = True
     app.run(debug=debug)
