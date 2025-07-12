@@ -87,15 +87,13 @@ def update_database_from_csv(url: str, csv_filename: str, db_filename: str, tabl
     temp_db = db_filename + ".temp"
 
     csv_dir = os.path.dirname(csv_filename)
-    print(csv_dir)
     if not os.path.exists(csv_dir):
-        print("making dirs...")
+        print(f"Making directory {csv_dir}")
         os.makedirs(csv_dir)
 
     db_dir = os.path.dirname(db_filename)
-    print(db_dir)
     if not os.path.exists(db_dir):
-        print("making dirs...")
+        print(f"Making directory {db_dir}")
         os.makedirs(db_dir)
 
     print("Starting CSV download...")
