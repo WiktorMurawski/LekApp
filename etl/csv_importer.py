@@ -74,7 +74,7 @@ def atomic_replace(src: str, dest: str) -> None:
     if os.path.exists(dest):
         shutil.copy2(dest, dest + '.backup')  # optional, for rollback
     os.replace(src, dest)
-    print(f"Replaced '{dest}' with '{src}' (atomic swap).")
+    print(f"Replaced '{dest}' with '{src}' atomically.")
 
 def init_db():
     conn = sqlite3.connect('database.db')
