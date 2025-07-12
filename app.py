@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
-from etl.csv_importer import update_database_from_csv
 
 app = Flask(__name__)
 
@@ -94,11 +93,4 @@ def search_entries():
     })
 
 if __name__ == '__main__':
-
-    try:
-        update_database_from_csv(CSV_URL, CSV_FILE, SQLITE_DB, TABLE_NAME)
-    except Exception as e:
-        print(f"Something went wrong: {e}")
-
-    debug = True
-    app.run(debug=debug)
+    app.run(debug=True)
