@@ -8,68 +8,26 @@
 </head>
 
 <body>
-    <input type=" text" id="textInput" placeholder="Enter something...">
-    <button onclick="submitQuery()">Submit</button>
-    <h3 id="label"></h3>
-    <table id="resultsTable" hidden="1">
-        <thead></thead>
-        <tbody></tbody>
-    </table>
+    <div class="search-container">
+        <!-- <input type="text" id="textInput" placeholder="Wyszukaj...">
+        <button onclick="submitQuery()">Szukaj</button>
+        <h3 id="label"></h3> -->
+        <input type="text" id="textInput" placeholder="Wyszukaj...">
+        <select id="searchType">
+            <option value="nazwa">Nazwa leku</option>
+            <option value="substancja">Substancja czynna</option>
+        </select>
+        <button onclick="submitQuery()">Szukaj</button>
+    </div>
 
-    <script>
-        async function submitQuery() {
-            const inputField = document.getElementById('textInput')
-            const text = inputField.value;
-            loadData(text);
-            inputField.value = "";
-        }
+    <div class="table-container">
+        <table id="resultsTable" hidden>
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-        async function loadData(query) {
-            const table = document.getElementById('resultsTable');
-            table.hidden = true;
-            const thead = table.querySelector('thead');
-            const tbody = table.querySelector('tbody');
-
-            const url = `/search?query=${encodeURIComponent(query)}`;
-
-            try {
-                const res = await fetch(url);
-                const result = await res.json();
-
-                const columns = result.columns;
-                const data = result.rows;
-
-                if (data.length === 0) {
-                    document.getElementById('label').innerHTML = "Nic nie znaleziono";
-                    return;
-                }
-
-                // Generate headers
-                thead.innerHTML = '<tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr>';
-
-                // Generate rows using the same column order
-                tbody.innerHTML = data.map(row =>
-                    '<tr>' + columns.map(col => {
-                        const cellContent = row[col] ?? '';
-                        return `<td>${cellContent}</td>`;
-                    }).join('') + '</tr>'
-                ).join('');
-
-                table.hidden = false;
-                const message = result.length < 1000 ? `Znaleziono ${result.length} wyników` : `Znaleziono >1000 wyników`;
-                document.getElementById('label').innerHTML = message;
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        }
-
-        document.getElementById("textInput").addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                submitQuery();
-            }
-        });
-
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
 </html>
