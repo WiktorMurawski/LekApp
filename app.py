@@ -4,6 +4,11 @@ from etl.csv_importer import update_database_from_csv
 
 app = Flask(__name__)
 
+CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
+CSV_FILE = "downloads/rejestr.csv"
+SQLITE_DB = "database/lekidatabase.db"
+TABLE_NAME = "leki"
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -87,12 +92,6 @@ def search_entries():
         'columns': column_names,
         'rows': [dict(row) for row in rows]
     })
-
-
-CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
-CSV_FILE = "downloads/rejestr.csv"
-SQLITE_DB = "database/lekidatabase.db"
-TABLE_NAME = "leki"
 
 if __name__ == '__main__':
 
