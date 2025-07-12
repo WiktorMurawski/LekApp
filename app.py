@@ -15,12 +15,54 @@ def search_entries():
     conn = sqlite3.connect(SQLITE_DB)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
+
+    columns = [
+        '"Identyfikator Produktu Leczniczego" AS "Identyfikator Produktu Leczniczego"',
+        '"Nazwa Produktu Leczniczego" AS "Nazwa Produktu Leczniczego"',
+        '"Nazwa powszechnie stosowana" AS "Nazwa powszechnie stosowana"',
+        '"Nazwa poprzednia produktu" AS "Nazwa poprzednia produktu"',
+        '"Substancja czynna" AS "Substancja czynna"',
+        # '"Rodzaj preparatu" AS "Rodzaj preparatu"',
+        # '"Zakaz stosowania u zwierząt" AS "Zakaz stosowania u zwierząt"',
+        '"Droga podania _ Gatunek _ Tkanka _ Okres karencji" AS "Droga podania"',
+        '"Moc" AS "Moc"',
+        '"Postać farmaceutyczna" AS "Postać farmaceutyczna"',
+        '"Typ procedury" AS "Typ procedury"',
+        # '"Numer pozwolenia" AS "Numer pozwolenia"',
+        '"Ważność pozwolenia" AS "Ważność pozwolenia"',
+        '"Kod ATC" AS "Kod ATC"',
+        '"Podmiot odpowiedzialny" AS "Podmiot odpowiedzialny"',
+        '"Opakowanie" AS "Opakowanie"',
+        # '"Nazwa wytwórcy" AS "Nazwa wytwórcy"',
+        # '"Nazwa importera" AS "Nazwa importera"',
+        # '"Nazwa wytwórcy_importera" AS "Nazwa wytwórcy-importera"',
+        # '"Kraj wytwórcy" AS "Kraj wytwórcy"',
+        # '"Kraj importera" AS "Kraj importera"',
+        # '"Kraj wytwórcy_importera" AS "Kraj wytwórcy-importera"',
+        # '"Podmiot odpowiedzialny w kraju eksportu" AS "Podmiot odpowiedzialny w kraju eksportu"',
+        # '"Kraj eksportu" AS "Kraj eksportu"',
+        # '"Podstawa prawna wniosku" AS "Podstawa prawna wniosku"',
+        # '"Ulotka" AS "Ulotka"',
+        # '"Charakterystyka" AS "Charakterystyka"',
+        # '"Etykieto_ulotka" AS "Etykieto-ulotka"',
+        # '"Ulotka importu równoległego" AS "Ulotka importu równoległego"',
+        # '"Etykieto_ulotka importu równoległego" AS "Etykieto-ulotka importu równoległego"',
+        # '"Oznakowanie opakowań importu równoległego" AS "Oznakowanie opakowań importu równoległego"',
+        # '"Materiały edukacyjne dla osoby wykonującej zawód medyczny" AS "Materiały edukacyjne dla osoby wykonującej zawód medyczny"',
+        # '"Materiały edukacyjne dla pacjenta" AS "Materiały edukacyjne dla pacjenta"',
+    ]
+
     sql_query = f"""
-        SELECT * FROM {TABLE_NAME}
-        WHERE [Nazwa Produktu Leczniczego] LIKE ?
+        SELECT 
+            {",\n    ".join(columns)}
+        FROM {TABLE_NAME}
+        WHERE "Rodzaj Preparatu" = 'Ludzki'
+        AND ("Nazwa Produktu Leczniczego" LIKE ?
+        OR "Nazwa powszechnie stosowana" LIKE ?
+        OR "Nazwa poprzednia produktu" LIKE ?)
         LIMIT 1000
     """
-    c.execute(sql_query, (f'%{query}%',))
+    c.execute(sql_query, [f'%{query}%'] * 3)
     column_names = [desc[0] for desc in c.description]
     rows = [dict(row) for row in c.fetchall()]
     conn.close()
