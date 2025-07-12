@@ -93,8 +93,7 @@ def search_entries():
         'rows': [dict(row) for row in rows]
     })
 
-@app.before_first_request
-def init_db():
+with app.app_context():
     try:
         update_database_from_csv(CSV_URL, CSV_FILE, SQLITE_DB, TABLE_NAME)
     except Exception as e:
