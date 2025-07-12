@@ -3,7 +3,7 @@ import sqlite3
 from etl.csv_importer import update_database_from_csv
 
 CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
-CSV_FILE = "downloads/rejestr.csv"
+CSV_FILE = "tmp/rejestr.csv"
 SQLITE_DB = "database/lekidatabase.db"
 TABLE_NAME = "leki"
 
