@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
-
-app = Flask(__name__)
+from etl.csv_importer import update_database_from_csv
 
 CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
 CSV_FILE = "downloads/rejestr.csv"
 SQLITE_DB = "database/lekidatabase.db"
 TABLE_NAME = "leki"
+
+app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -92,5 +93,13 @@ def search_entries():
         'rows': [dict(row) for row in rows]
     })
 
+@app.before_first_request
+def init_db():
+    try:
+        update_database_from_csv(CSV_URL, CSV_FILE, SQLITE_DB, TABLE_NAME)
+    except Exception as e:
+        print(f"Something went wrong: {e}")
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug = True
+    app.run(debug=debug)
