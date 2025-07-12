@@ -88,11 +88,13 @@ def search_entries():
         'rows': [dict(row) for row in rows]
     })
 
+
+CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
+CSV_FILE = "downloads/rejestr.csv"
+SQLITE_DB = "database/lekidatabase.db"
+TABLE_NAME = "leki"
+
 if __name__ == '__main__':
-    CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
-    CSV_FILE = "downloads/rejestr.csv"
-    SQLITE_DB = "database/lekidatabase.db"
-    TABLE_NAME = "leki"
 
     try:
         update_database_from_csv(CSV_URL, CSV_FILE, SQLITE_DB, TABLE_NAME)
