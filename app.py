@@ -11,6 +11,7 @@ def index():
 @app.route('/search', methods=['GET'])
 def search_entries():
     query = request.args.get('query', '').lower()
+    search_type = request.args.get('type', 'nazwa')
 
     conn = sqlite3.connect(SQLITE_DB)
     conn.row_factory = sqlite3.Row
@@ -52,17 +53,31 @@ def search_entries():
         # '"Materiały edukacyjne dla pacjenta" AS "Materiały edukacyjne dla pacjenta"',
     ]
 
+    where_clause = """
+        "Rodzaj Preparatu" = 'Ludzki' AND (
+            "Nazwa Produktu Leczniczego" LIKE ?
+            OR "Nazwa powszechnie stosowana" LIKE ?
+            OR "Nazwa poprzednia produktu" LIKE ?
+        )
+    """
+    params = [f'%{query}%'] * 3
+
+    if search_type == "substancja":
+        where_clause = """
+            "Rodzaj Preparatu" = 'Ludzki' AND "Substancja czynna" LIKE ?
+        """
+        params = [f'%{query}%']
+        print("substancja!")
+
     sql_query = f"""
         SELECT 
             {",\n    ".join(columns)}
         FROM {TABLE_NAME}
-        WHERE "Rodzaj Preparatu" = 'Ludzki'
-        AND ("Nazwa Produktu Leczniczego" LIKE ?
-        OR "Nazwa powszechnie stosowana" LIKE ?
-        OR "Nazwa poprzednia produktu" LIKE ?)
+        WHERE {where_clause}
         LIMIT 1000
     """
-    c.execute(sql_query, [f'%{query}%'] * 3)
+
+    c.execute(sql_query, params)
     column_names = [desc[0] for desc in c.description]
     rows = [dict(row) for row in c.fetchall()]
     conn.close()
