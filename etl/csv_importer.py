@@ -86,6 +86,10 @@ def init_db():
 def update_database_from_csv(url: str, csv_filename: str, db_filename: str, table_name: str) -> None:
     temp_db = db_filename + ".temp"
 
+    db_dir = os.path.dirname(db_filename)
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+
     print("Starting CSV download...")
     download_csv(url, csv_filename)
 

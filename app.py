@@ -1,16 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
-import os
 from etl.csv_importer import update_database_from_csv
 
 CSV_URL = "https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/public-pl-report/get-csv"
 CSV_FILE = "downloads/rejestr.csv"
 SQLITE_DB = "database/lekidatabase.db"
 TABLE_NAME = "leki"
-
-db_dir = os.path.dirname(SQLITE_DB)
-if not os.path.exists(db_dir):
-    os.makedirs(db_dir)
 
 app = Flask(__name__)
 
