@@ -14,7 +14,6 @@ async function loadData(query, type) {
     const thead = table.querySelector('thead');
     const tbody = table.querySelector('tbody');
 
-    // const url = `/search?query=${encodeURIComponent(query)}`;
     const url = `/search?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}`;
 
     try {
@@ -41,7 +40,6 @@ async function loadData(query, type) {
         ).join('');
 
         table.hidden = false;
-        // const message = result.length < 1000 ? `Znaleziono ${result.length} wyników` : `Znaleziono >1000 wyników`;
         let message = "";
         if (result.length == 1000)
             message = "Znaleziono >1000 wyników";
